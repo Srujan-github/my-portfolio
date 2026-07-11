@@ -35,7 +35,9 @@ const ICONS = {
   briefcase:  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
   calendar:   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
   arrow:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+  'arrow-up': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`,
   check:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  'git-commit': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg>`,
 };
 
 function icon(name, cls = '') {
@@ -102,9 +104,16 @@ function renderNav(content) {
     `<a class="nav__link" href="${l.href}" data-href="${l.href}">${esc(l.label)}</a>`
   ).join('');
 
+  const picHtml = personal.profilePic
+    ? `<img src="${personal.profilePic}" alt="${esc(personal.name)}" class="nav__profile-pic" />`
+    : '';
+
   document.getElementById('nav').innerHTML = `
     <div class="nav__inner">
-      <a class="nav__logo" href="#hero">${esc(nav.logo)}</a>
+      <a class="nav__logo" href="#hero">
+        ${picHtml}
+        <span class="nav__logo-text">${esc(nav.logo)}</span>
+      </a>
       <nav class="nav__links" aria-label="Main navigation">
         ${links}
         <a class="nav__link nav__cta" href="${personal.resumeDownload}" target="_blank" rel="noopener">
@@ -135,6 +144,12 @@ function renderHero(content) {
     </div>
   `).join('');
 
+  const picHtml = personal.profilePic ? `
+    <div class="hero__pic-wrap reveal-right">
+      <img src="${personal.profilePic}" alt="${esc(personal.name)}" class="hero__pic" />
+    </div>
+  ` : '';
+
   document.getElementById('hero').innerHTML = `
     <div class="hero__bg">
       <div class="hero__grid"></div>
@@ -143,45 +158,51 @@ function renderHero(content) {
       <div class="hero__orb hero__orb--3"></div>
     </div>
     <div class="container">
-      <div class="hero__content">
-        <div class="hero__badge reveal">
-          <span class="hero__badge-dot"></span>
-          ${esc(personal.availability)}
+      <div class="hero__layout">
+        <div class="hero__content">
+          <h1 class="hero__name reveal">
+            ${esc(personal.name.split(' ')[0])} <br>
+            <span class="hero__name-gradient">${esc(personal.name.split(' ').slice(1).join(' '))}</span>
+          </h1>
+          <div class="hero__title-wrap reveal reveal-delay-1">
+            <span class="hero__typing" id="typingText" aria-live="polite"></span>
+            <span class="hero__cursor" aria-hidden="true"></span>
+          </div>
+          <div class="hero__availability reveal reveal-delay-2">
+            <span class="hero__badge-dot"></span>
+            ${esc(personal.availability)}
+          </div>
+          <p class="hero__subtitle reveal reveal-delay-2">${esc(personal.heroSubtitle)}</p>
+          <div class="hero__social reveal reveal-delay-3">
+            <a class="social-link" href="${personal.linkedin}" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+              ${icon('linkedin')} <span>LinkedIn</span>
+            </a>
+            <a class="social-link" href="${personal.github}" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+              ${icon('github')} <span>GitHub</span>
+            </a>
+            <a class="social-link" href="mailto:${personal.email}" aria-label="Email" title="Email">
+              ${icon('mail')} <span>Email</span>
+            </a>
+            <a class="social-link" href="tel:${personal.phone}" aria-label="Phone" title="Phone">
+              ${icon('phone')} <span>Call</span>
+            </a>
+          </div>
+          <div class="hero__actions reveal reveal-delay-3">
+            <a class="btn btn-primary" href="#projects">
+              ${icon('arrow', 'btn-icon')} View Projects
+            </a>
+            <a class="btn btn-secondary" href="#contact">
+              ${icon('mail', 'btn-icon')} Let's Connect
+            </a>
+            <a class="btn btn-outline" href="${personal.resumeDownload}" target="_blank" rel="noopener">
+              ${icon('download', 'btn-icon')} Download CV
+            </a>
+          </div>
+          <div class="hero__stats">
+            ${statsHtml}
+          </div>
         </div>
-        <div class="social-links reveal reveal-delay-1">
-          <a class="social-link" href="${personal.linkedin}" target="_blank" rel="noopener" aria-label="LinkedIn">
-            ${icon('linkedin')}
-          </a>
-          <a class="social-link" href="${personal.github}" target="_blank" rel="noopener" aria-label="GitHub">
-            ${icon('github')}
-          </a>
-          <a class="social-link" href="${personal.ctaHref || 'mailto:' + personal.email}" aria-label="Email">
-            ${icon('mail')}
-          </a>
-        </div>
-        <h1 class="hero__name reveal reveal-delay-1">
-          ${esc(personal.name.split(' ')[0])} <br>
-          <span class="hero__name-gradient">${esc(personal.name.split(' ').slice(1).join(' '))}</span>
-        </h1>
-        <div class="hero__title-wrap reveal reveal-delay-2">
-          <span class="hero__typing" id="typingText" aria-live="polite"></span>
-          <span class="hero__cursor" aria-hidden="true"></span>
-        </div>
-        <p class="hero__subtitle reveal reveal-delay-3">${esc(personal.heroSubtitle)}</p>
-        <div class="hero__actions reveal reveal-delay-3">
-          <a class="btn btn-primary" href="#projects">
-            ${icon('arrow', 'btn-icon')} View Projects
-          </a>
-          <a class="btn btn-secondary" href="#contact">
-            ${icon('mail', 'btn-icon')} Contact Me
-          </a>
-          <a class="btn btn-outline" href="${personal.resumeDownload}" target="_blank" rel="noopener">
-            ${icon('download', 'btn-icon')} Download CV
-          </a>
-        </div>
-        <div class="hero__stats">
-          ${statsHtml}
-        </div>
+        ${picHtml}
       </div>
     </div>
   `;
@@ -197,9 +218,13 @@ function renderAbout(content) {
 
   const cards = about.highlights.map((h, i) => `
     <div class="about__highlight-card reveal reveal-delay-${i+1}">
-      <div class="about__card-icon">${icon(h.icon)}</div>
-      <h4>${esc(h.label)}</h4>
-      <p>${esc(h.desc)}</p>
+      <div class="about__card-icon-wrap">
+        <div class="about__card-icon">${icon(h.icon)}</div>
+      </div>
+      <div class="about__card-body">
+        <h4>${esc(h.label)}</h4>
+        <p>${esc(h.desc)}</p>
+      </div>
     </div>
   `).join('');
 
@@ -211,17 +236,20 @@ function renderAbout(content) {
       </div>
       <div class="about__grid">
         <div class="about__text reveal-left">
-          <h3>Hey, I'm ${esc(personal.name.split(' ')[0])} 👋</h3>
-          <p>${esc(about.intro)}</p>
+          <div class="about__intro-badge">
+            <span class="about__intro-badge-dot"></span>
+            ${esc(personal.availability)}
+          </div>
+          <h3>Hey, I'm <span class="about__name-highlight">${esc(personal.name.split(' ')[0])}</span> 👋</h3>
+          <p class="about__lead">${esc(about.intro)}</p>
           ${paragraphs}
-          <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
-            <div class="availability-chip">
-              <span class="availability-dot"></span>
-              ${esc(personal.availability)}
-            </div>
-            <span style="display:flex;align-items:center;gap:.5rem;font-size:.875rem;color:var(--clr-text-3);">
-              ${icon('map-pin')} ${esc(personal.location)}
-            </span>
+          <div class="about__meta-row">
+            <span class="about__meta-chip">${icon('map-pin')} ${esc(personal.location)}</span>
+            <span class="about__meta-chip">${icon('briefcase')} 3+ Years Experience</span>
+          </div>
+          <div class="about__cta-row">
+            <a class="btn btn-primary" href="#contact">${icon('mail','btn-icon')} Hire Me</a>
+            <a class="btn btn-secondary" href="${personal.resumeDownload}" target="_blank" rel="noopener">${icon('download','btn-icon')} Resume</a>
           </div>
         </div>
         <div class="about__highlights reveal-right">
@@ -233,23 +261,50 @@ function renderAbout(content) {
 }
 
 // ── RENDER: SKILLS ─────────────────────────────────────────
+// Proficiency levels (percentage) for each category
+const SKILL_PROFICIENCY = {
+  'Languages': 90,
+  'Android': 97,
+  'Architecture': 95,
+  'Libraries & Networking': 92,
+  'Real-time & Firebase': 88,
+  'Testing': 85,
+  'DevOps & Tools': 80,
+  'AI / ML': 75,
+};
+
 function renderSkills(content) {
   const cards = content.skills.map((cat, i) => {
-    const tags = cat.items.map(item =>
-      `<span class="skill-tag">${esc(item)}</span>`
-    ).join('');
-    const bgColor = cat.color + '15';
+    const bgColor = cat.color + '18';
     const fgColor = cat.color;
+    const proficiency = SKILL_PROFICIENCY[cat.category] || 80;
+
+    const skillItems = cat.items.map(item => `
+      <div class="skill-item">
+        <div class="skill-item__header">
+          <span class="skill-item__name">${esc(item)}</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-bar__fill" style="--bar-color:${fgColor}" data-width="${Math.max(55, proficiency - Math.floor(Math.random()*15))}"></div>
+        </div>
+      </div>
+    `).join('');
 
     return `
-      <div class="skill-card reveal reveal-delay-${(i % 5) + 1}">
+      <div class="skill-card reveal reveal-delay-${(i % 5) + 1}" style="--cat-color:${fgColor}; --cat-bg:${bgColor}">
         <div class="skill-card__header">
           <div class="skill-card__icon-wrap" style="background:${bgColor}; color:${fgColor}">
             ${icon(cat.icon)}
           </div>
-          <span class="skill-card__title">${esc(cat.category)}</span>
+          <div class="skill-card__title-group">
+            <span class="skill-card__title">${esc(cat.category)}</span>
+            <span class="skill-card__pct" style="color:${fgColor}">${proficiency}%</span>
+          </div>
         </div>
-        <div class="skill-tags">${tags}</div>
+        <div class="skill-card__master-bar">
+          <div class="skill-card__master-fill" style="--bar-color:${fgColor}; --bar-width:${proficiency}%"></div>
+        </div>
+        <div class="skill-items">${skillItems}</div>
       </div>
     `;
   }).join('');
@@ -259,11 +314,27 @@ function renderSkills(content) {
       <div class="section-header">
         <div class="section-label">${icon('zap')} Technical Skills</div>
         <h2 class="section-title">My Technology Arsenal</h2>
-        <p class="section-subtitle">A curated set of tools and technologies I've worked with in production environments.</p>
+        <p class="section-subtitle">Production-tested tools & technologies with real-world proficiency.</p>
       </div>
       <div class="skills__grid">${cards}</div>
     </div>
   `;
+
+  // Animate bars on scroll into view
+  requestAnimationFrame(() => {
+    const bars = document.querySelectorAll('.skill-bar__fill, .skill-card__master-fill');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const el = e.target;
+          const w = el.dataset.width || el.style.getPropertyValue('--bar-width');
+          el.style.width = typeof w === 'string' && w.includes('%') ? w : w + '%';
+          obs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.2 });
+    bars.forEach(b => obs.observe(b));
+  });
 }
 
 // ── RENDER: EXPERIENCE ─────────────────────────────────────
@@ -278,6 +349,7 @@ function renderExperience(content) {
     ).join('');
 
     const duration = getDurationMonths(exp.period);
+    const typeBadge = exp.type ? `<span class="exp-type-badge">${esc(exp.type)}</span>` : '';
 
     return `
       <div class="timeline-item">
@@ -288,7 +360,7 @@ function renderExperience(content) {
           <div class="timeline-card__header">
             <div>
               <div class="timeline-card__role">${esc(exp.role)}</div>
-              <div class="timeline-card__company">${esc(exp.company)}</div>
+              <div class="timeline-card__company">${esc(exp.company)} ${typeBadge}</div>
             </div>
             <div class="timeline-card__meta">
               <div class="timeline-badge">
@@ -318,26 +390,25 @@ function renderExperience(content) {
 
 // ── RENDER: PROJECTS ───────────────────────────────────────
 function renderProjects(content) {
-  const featured  = content.projects.filter(p => p.featured);
-  const other     = content.projects.filter(p => !p.featured);
+  // Merge all projects into one unified grid
+  const allProjects = content.projects;
 
-  function projectCard(p, isFeatured) {
-    const tags     = p.tags.map(t => `<span class="skill-tag">${esc(t)}</span>`).join('');
-    const metrics  = (p.metrics || []).map(m => `<span class="project-metric">${icon('check')} ${esc(m)}</span>`).join('');
-    const bullets  = p.highlights.slice(0, isFeatured ? 4 : 3).map(h =>
+  function projectCard(p) {
+    const tags    = p.tags.map(t => `<span class="skill-tag">${esc(t)}</span>`).join('');
+    const metrics = (p.metrics || []).map(m => `<span class="project-metric">${icon('check')} ${esc(m)}</span>`).join('');
+    const bullets = p.highlights.slice(0, 4).map(h =>
       `<li class="project-highlight">${esc(h)}</li>`
     ).join('');
-
     const links = [
       p.githubUrl ? `<a class="project-link" href="${p.githubUrl}" target="_blank" rel="noopener">${icon('github')} GitHub</a>` : '',
       p.liveUrl   ? `<a class="project-link" href="${p.liveUrl}" target="_blank" rel="noopener">${icon('external-link')} Live</a>` : '',
     ].filter(Boolean).join('');
 
     return `
-      <div class="project-card ${isFeatured ? 'featured' : ''} reveal">
-        ${isFeatured ? `<div class="project-card__badge">${icon('star')} Featured</div>` : ''}
+      <div class="project-card reveal">
+        <div class="project-card__top-bar"></div>
         <div class="project-card__header">
-          <div>
+          <div class="project-card__name-wrap">
             <div class="project-card__name">${esc(p.name)}</div>
             <div class="project-card__subtitle">${esc(p.subtitle)}</div>
           </div>
@@ -352,9 +423,6 @@ function renderProjects(content) {
     `;
   }
 
-  const featuredHtml = featured.map(p => projectCard(p, true)).join('');
-  const otherHtml    = other.map(p => projectCard(p, false)).join('');
-
   document.getElementById('projects').innerHTML = `
     <div class="container">
       <div class="section-header">
@@ -362,11 +430,7 @@ function renderProjects(content) {
         <h2 class="section-title">What I've Built</h2>
         <p class="section-subtitle">Production-grade applications shipped for enterprise clients and real-world users.</p>
       </div>
-      <div class="projects__featured">${featuredHtml}</div>
-      ${otherHtml ? `
-        <div class="projects__other-label">More Projects</div>
-        <div class="projects__other">${otherHtml}</div>
-      ` : ''}
+      <div class="projects__all-grid">${allProjects.map(p => projectCard(p)).join('')}</div>
     </div>
   `;
 }
@@ -390,7 +454,7 @@ function renderAI(content) {
     <div class="container">
       <div class="section-header">
         <div class="section-label">${icon('cpu')} AI & LLM</div>
-        <h2 class="section-title" style="color:#F8FAFC">Generative AI & Agentic AI Experience</h2>
+        <h2 class="section-title" style="color:#F8FAFC">Generative AI & LLM Experience</h2>
         <p class="section-subtitle" style="color:#94A3B8">A dedicated discipline — not a buzzword.</p>
       </div>
       <div style="text-align:center;">
@@ -404,50 +468,88 @@ function renderAI(content) {
 
 // ── RENDER: OPEN SOURCE ─────────────────────────────────────
 function renderOpenSource(content) {
-  const cards = content.openSource.map(os => `
-    <div class="opensource-card reveal">
-      <div class="opensource-card__info">
-        <div class="opensource-card__name">
-          ${icon('github')}
-          <h3>${esc(os.name)}</h3>
+  const cards = content.openSource.map(os => {
+    const prTags = (os.prs || []).map(pr =>
+      `<span class="os-pr-tag">${icon('git-commit')} PR ${esc(pr)}</span>`
+    ).join('');
+    const issueTags = (os.issues || []).map(iss =>
+      `<span class="os-issue-tag">${icon('git-commit')} Issue ${esc(iss)}</span>`
+    ).join('');
+    const prSection = (prTags || issueTags) ? `
+      <div class="os-contributions">
+        ${prTags}${issueTags}
+      </div>
+    ` : '';
+
+    return `
+      <div class="opensource-card reveal">
+        <div class="opensource-card__info">
+          <div class="opensource-card__name">
+            ${icon('github')}
+            <h3>${esc(os.name)}</h3>
+            ${os.stars ? `<span class="os-stars">${icon('star')} ${esc(os.stars)}</span>` : ''}
+          </div>
+          <p class="opensource-card__desc">${esc(os.description)}</p>
+          ${prSection}
+          <div class="project-card__tags">
+            ${os.tags.map(t => `<span class="skill-tag">${esc(t)}</span>`).join('')}
+          </div>
         </div>
-        <p class="opensource-card__desc">${esc(os.description)}</p>
-        <div class="project-card__tags">
-          ${os.tags.map(t => `<span class="skill-tag">${esc(t)}</span>`).join('')}
+        <div class="opensource-card__actions">
+          <a class="btn btn-primary" href="${os.url}" target="_blank" rel="noopener">
+            ${icon('github', 'btn-icon')} View on GitHub
+          </a>
         </div>
       </div>
-      <div class="opensource-card__actions">
-        <a class="btn btn-primary" href="${os.url}" target="_blank" rel="noopener">
-          ${icon('github', 'btn-icon')} View on GitHub
-        </a>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   document.getElementById('opensource').innerHTML = `
     <div class="container">
       <div class="section-header">
         <div class="section-label">${icon('github')} Open Source</div>
         <h2 class="section-title">Open Source Contributions</h2>
-        <p class="section-subtitle">Giving back to the developer community with reusable, production-ready components.</p>
+        <p class="section-subtitle">Giving back to the developer community with real, merged contributions.</p>
       </div>
-      ${cards}
+      <div class="opensource-grid">${cards}</div>
     </div>
   `;
 }
 
 // ── RENDER: ACHIEVEMENTS ───────────────────────────────────
+const ACHIEVEMENT_GRADIENTS = [
+  'linear-gradient(135deg,#2563EB,#7C3AED)',
+  'linear-gradient(135deg,#0891B2,#2563EB)',
+  'linear-gradient(135deg,#7C3AED,#EC4899)',
+  'linear-gradient(135deg,#059669,#0891B2)',
+  'linear-gradient(135deg,#D97706,#DC2626)',
+  'linear-gradient(135deg,#2563EB,#059669)',
+  'linear-gradient(135deg,#7C3AED,#2563EB)',
+  'linear-gradient(135deg,#EC4899,#7C3AED)',
+];
+
 function renderAchievements(content) {
-  const cards = content.achievements.map((a, i) => `
-    <div class="achievement-card reveal reveal-delay-${(i % 3) + 1}">
-      <div class="achievement-icon">${icon(a.icon)}</div>
-      <div class="achievement-card__content">
-        <div class="achievement-type ${a.type}">${esc(a.type)}</div>
-        <h4>${esc(a.title)}</h4>
-        <p>${esc(a.description)}</p>
+  // Split into achievements (top row) and certifications (bottom row)
+  const achievements = content.achievements.filter(a => a.type === 'achievement');
+  const certs = content.achievements.filter(a => a.type === 'certification');
+
+  function achieveCard(a, idx, isCert) {
+    const grad = ACHIEVEMENT_GRADIENTS[idx % ACHIEVEMENT_GRADIENTS.length];
+    return `
+      <div class="ach-card ${isCert ? 'ach-card--cert' : 'ach-card--win'} reveal reveal-delay-${(idx % 4) + 1}">
+        <div class="ach-card__glow" style="background:${grad}"></div>
+        <div class="ach-card__icon-wrap" style="background:${grad}">
+          ${icon(a.icon)}
+        </div>
+        <div class="ach-card__body">
+          <span class="ach-card__type ${a.type}">${a.type === 'achievement' ? '🏆 Achievement' : '📜 Certification'}</span>
+          <h4 class="ach-card__title">${esc(a.title)}</h4>
+          <p class="ach-card__desc">${esc(a.description)}</p>
+        </div>
+        <div class="ach-card__shine"></div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }
 
   document.getElementById('achievements').innerHTML = `
     <div class="container">
@@ -456,7 +558,10 @@ function renderAchievements(content) {
         <h2 class="section-title">Achievements & Certifications</h2>
         <p class="section-subtitle">Recognition, impact metrics, and continuous learning milestones.</p>
       </div>
-      <div class="achievements__grid">${cards}</div>
+      <div class="ach-section-label">🏆 Achievements</div>
+      <div class="ach-grid ach-grid--achievements">${achievements.map((a,i) => achieveCard(a,i,false)).join('')}</div>
+      <div class="ach-section-label ach-section-label--cert">📜 Certifications</div>
+      <div class="ach-grid ach-grid--certs">${certs.map((a,i) => achieveCard(a,i,true)).join('')}</div>
     </div>
   `;
 }
@@ -499,36 +604,96 @@ function renderEducation(content) {
 function renderContact(content) {
   const { contact, personal } = content;
 
+  const connectItems = [
+    {
+      icon: 'linkedin',
+      label: 'LinkedIn',
+      value: 'sai-srujan-thammishetti',
+      href: personal.linkedin,
+      color: '#0A66C2',
+      bg: 'rgba(10,102,194,0.08)',
+      border: 'rgba(10,102,194,0.2)',
+      external: true,
+    },
+    {
+      icon: 'github',
+      label: 'GitHub',
+      value: 'github.com/Srujan-github',
+      href: personal.github,
+      color: '#24292e',
+      bg: 'rgba(36,41,46,0.06)',
+      border: 'rgba(36,41,46,0.15)',
+      external: true,
+    },
+    {
+      icon: 'mail',
+      label: 'Email',
+      value: esc(personal.email),
+      href: `mailto:${personal.email}`,
+      color: '#2563EB',
+      bg: 'rgba(37,99,235,0.06)',
+      border: 'rgba(37,99,235,0.15)',
+      external: false,
+    },
+    {
+      icon: 'phone',
+      label: 'Phone',
+      value: esc(personal.phone),
+      href: `tel:${personal.phone}`,
+      color: '#059669',
+      bg: 'rgba(5,150,105,0.06)',
+      border: 'rgba(5,150,105,0.15)',
+      external: false,
+    },
+    {
+      icon: 'map-pin',
+      label: 'Location',
+      value: esc(personal.location),
+      href: null,
+      color: '#7C3AED',
+      bg: 'rgba(124,58,237,0.06)',
+      border: 'rgba(124,58,237,0.15)',
+      external: false,
+    },
+  ];
+
+  const connectCards = connectItems.map((item, i) => {
+    const tag = item.href ? 'a' : 'div';
+    const attrs = item.href
+      ? `href="${item.href}"${item.external ? ' target="_blank" rel="noopener"' : ''}`
+      : '';
+    return `
+      <${tag} class="connect-card reveal reveal-delay-${i + 1}" ${attrs}
+        style="--card-color:${item.color}; --card-bg:${item.bg}; --card-border:${item.border};">
+        <div class="connect-card__icon" style="color:${item.color}; background:${item.bg}; border-color:${item.border};">
+          ${icon(item.icon)}
+        </div>
+        <div class="connect-card__info">
+          <span class="connect-card__label">${esc(item.label)}</span>
+          <span class="connect-card__value">${item.value}</span>
+        </div>
+        ${item.href ? `<span class="connect-card__arrow">${icon('arrow')}</span>` : ''}
+      </${tag}>
+    `;
+  }).join('');
+
   document.getElementById('contact').innerHTML = `
     <div class="container">
-      <div class="contact-card reveal">
-        <h2 class="contact-card__heading">${esc(contact.heading)}</h2>
-        <p class="contact-card__sub">${esc(contact.subheading)}</p>
-        <div class="contact-card__actions">
-          <a class="btn btn-primary" href="${contact.ctaHref}">
-            ${icon('mail', 'btn-icon')} ${esc(contact.ctaLabel)}
-          </a>
-          <a class="btn btn-secondary" href="${contact.secondaryHref}" target="_blank" rel="noopener">
-            ${icon('download', 'btn-icon')} ${esc(contact.secondaryLabel)}
-          </a>
-        </div>
-        <div class="contact-links">
-          <a class="contact-link" href="${personal.linkedin}" target="_blank" rel="noopener">
-            ${icon('linkedin')} LinkedIn
-          </a>
-          <a class="contact-link" href="${personal.github}" target="_blank" rel="noopener">
-            ${icon('github')} GitHub
-          </a>
-          <a class="contact-link" href="mailto:${personal.email}">
-            ${icon('mail')} ${esc(personal.email)}
-          </a>
-          <a class="contact-link" href="tel:${personal.phone}">
-            ${icon('phone')} ${esc(personal.phone)}
-          </a>
-          <span class="contact-link">
-            ${icon('map-pin')} ${esc(personal.location)}
-          </span>
-        </div>
+      <div class="section-header">
+        <div class="section-label">${icon('mail')} Contact</div>
+        <h2 class="section-title">${esc(contact.heading)}</h2>
+        <p class="section-subtitle" style="max-width:640px;">${esc(contact.subheading)}</p>
+      </div>
+      <div class="connect-grid">
+        ${connectCards}
+      </div>
+      <div class="contact-cta reveal">
+        <a class="btn btn-primary btn-lg" href="${contact.ctaHref}">
+          ${icon('mail', 'btn-icon')} ${esc(contact.ctaLabel)}
+        </a>
+        <a class="btn btn-secondary btn-lg" href="${contact.secondaryHref}" target="_blank" rel="noopener">
+          ${icon('download', 'btn-icon')} ${esc(contact.secondaryLabel)}
+        </a>
       </div>
     </div>
   `;
@@ -536,12 +701,83 @@ function renderContact(content) {
 
 // ── RENDER: FOOTER ─────────────────────────────────────────
 function renderFooter(content) {
-  const { footer, personal } = content;
+  const { footer, personal, nav } = content;
+
+  const footerLinks = nav.links.map(l =>
+    `<a class="footer__link" href="${l.href}">${esc(l.label)}</a>`
+  ).join('');
+
   document.getElementById('footer').innerHTML = `
-    <div class="container">
-      <p>${esc(footer.note)} &nbsp;|&nbsp; &copy; <span>${footer.year}</span></p>
+    <div class="footer__top">
+      <div class="container">
+        <div class="footer__grid">
+          <div class="footer__brand">
+            <div class="footer__logo">${esc(nav.logo)}</div>
+            <p class="footer__tagline">${esc(personal.tagline)}</p>
+            <p class="footer__desc">Senior Android Developer based in ${esc(personal.location)}, building world-class mobile experiences with Kotlin, Jetpack Compose & KMM.</p>
+            <div class="footer__socials">
+              <a class="footer__social" href="${personal.linkedin}" target="_blank" rel="noopener" aria-label="LinkedIn">
+                ${icon('linkedin')}
+              </a>
+              <a class="footer__social" href="${personal.github}" target="_blank" rel="noopener" aria-label="GitHub">
+                ${icon('github')}
+              </a>
+              <a class="footer__social" href="mailto:${personal.email}" aria-label="Email">
+                ${icon('mail')}
+              </a>
+              <a class="footer__social" href="tel:${personal.phone}" aria-label="Phone">
+                ${icon('phone')}
+              </a>
+            </div>
+          </div>
+          <div class="footer__nav-col">
+            <h4 class="footer__col-title">Navigation</h4>
+            <div class="footer__links">
+              ${footerLinks}
+            </div>
+          </div>
+          <div class="footer__contact-col">
+            <h4 class="footer__col-title">Get in Touch</h4>
+            <div class="footer__contact-items">
+              <a class="footer__contact-item" href="mailto:${personal.email}">
+                ${icon('mail')} ${esc(personal.email)}
+              </a>
+              <a class="footer__contact-item" href="tel:${personal.phone}">
+                ${icon('phone')} ${esc(personal.phone)}
+              </a>
+              <span class="footer__contact-item">
+                ${icon('map-pin')} ${esc(personal.location)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="container">
+        <p class="footer__note">${esc(footer.note)}</p>
+        <p class="footer__copy">&copy; ${footer.year} ${esc(personal.name)}. All rights reserved.</p>
+      </div>
     </div>
   `;
+}
+
+// ── BACK TO TOP BUTTON ─────────────────────────────────────
+function renderBackToTop() {
+  const btn = document.createElement('button');
+  btn.id = 'backToTop';
+  btn.className = 'back-to-top';
+  btn.setAttribute('aria-label', 'Back to top');
+  btn.innerHTML = ICONS['arrow-up'] || '↑';
+  document.body.appendChild(btn);
+
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 300);
+  }, { passive: true });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 }
 
 // ── TYPING ANIMATION ───────────────────────────────────────
@@ -616,7 +852,6 @@ function initScrollReveal() {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
-        // Trigger counters when hero stats come into view
         if (entry.target.querySelector('[data-target]')) {
           animateCounters();
         }
@@ -633,12 +868,10 @@ function initNav() {
   const nav = document.getElementById('nav');
   if (!nav) return;
 
-  // Scrolled class
   window.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', window.scrollY > 20);
   }, { passive: true });
 
-  // Active link highlighting
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav__link[data-href]');
 
@@ -658,7 +891,6 @@ function initNav() {
   window.addEventListener('scroll', setActiveLink, { passive: true });
   setActiveLink();
 
-  // Hamburger
   const hamburger   = document.getElementById('hamburger');
   const mobileMenu  = document.getElementById('mobileMenu');
 
@@ -669,7 +901,6 @@ function initNav() {
       hamburger.setAttribute('aria-expanded', open);
     });
 
-    // Close mobile menu on link click
     mobileMenu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         hamburger.classList.remove('open');
@@ -710,8 +941,8 @@ function renderAll(content) {
     renderEducation(content);
     renderContact(content);
     renderFooter(content);
+    renderBackToTop();
 
-    // Init interactions after render
     requestAnimationFrame(() => {
       initNav();
       initScrollReveal();
