@@ -120,7 +120,7 @@ function renderNav(content) {
           ${icon('download', 'btn-icon')} Resume
         </a>
       </nav>
-      <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <button class="nav__hamburger" id="hamburger" type="button" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -161,8 +161,8 @@ function renderHero(content) {
       <div class="hero__layout">
         <div class="hero__content">
           <h1 class="hero__name reveal">
-            ${esc(personal.name.split(' ')[0])} <br>
-            <span class="hero__name-gradient">${esc(personal.name.split(' ').slice(1).join(' '))}</span>
+            ${esc(personal.name.split(' ').slice(0, 2).join(' '))} <br>
+            <span class="hero__name-gradient">${esc(personal.name.split(' ').slice(2).join(' '))}</span>
           </h1>
           <div class="hero__title-wrap reveal reveal-delay-1">
             <span class="hero__typing" id="typingText" aria-live="polite"></span>
