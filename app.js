@@ -527,22 +527,31 @@ const ACHIEVEMENT_GRADIENTS = [
   'linear-gradient(135deg,#7C3AED,#2563EB)',
   'linear-gradient(135deg,#EC4899,#7C3AED)',
 ];
+// Global fallback: called when a cert card image fails to load
+window.certImgError = function(img) {
+  const wrap = img.closest('.cert-card__img-wrap');
+  if (wrap) {
+    const ph = document.createElement('div');
+    ph.className = 'cert-card__pdf-preview';
+    ph.innerHTML = '<div class="cert-card__pdf-icon"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>';
+    wrap.replaceWith(ph);
+  }
+};
 
 function renderAchievements(content) {
-  // Split into achievements (top row) and certifications (bottom row)
   const achievements = content.achievements.filter(a => a.type === 'achievement');
   const certs = content.achievements.filter(a => a.type === 'certification');
 
-  function achieveCard(a, idx, isCert) {
+  function achieveCard(a, idx) {
     const grad = ACHIEVEMENT_GRADIENTS[idx % ACHIEVEMENT_GRADIENTS.length];
     return `
-      <div class="ach-card ${isCert ? 'ach-card--cert' : 'ach-card--win'} reveal reveal-delay-${(idx % 4) + 1}">
+      <div class="ach-card ach-card--win reveal reveal-delay-${(idx % 4) + 1}">
         <div class="ach-card__glow" style="background:${grad}"></div>
         <div class="ach-card__icon-wrap" style="background:${grad}">
           ${icon(a.icon)}
         </div>
         <div class="ach-card__body">
-          <span class="ach-card__type ${a.type}">${a.type === 'achievement' ? '🏆 Achievement' : '📜 Certification'}</span>
+          <span class="ach-card__type achievement">🏆 Achievement</span>
           <h4 class="ach-card__title">${esc(a.title)}</h4>
           <p class="ach-card__desc">${esc(a.description)}</p>
         </div>
@@ -550,6 +559,63 @@ function renderAchievements(content) {
       </div>
     `;
   }
+
+  // Brand icons for cert issuers (linked PNG files)
+  const ISSUER_ICONS = {
+    'Google Play Academy': `<img src="res/icons/google-play.png" alt="Google Play Academy" />`,
+    'Udemy': `<img src="res/icons/udemy.png" alt="Udemy" />`,
+    'DPE University (Gradle)': `<img src="res/icons/gradle.png" alt="Gradle" />`,
+  };
+
+  function certCard(c, idx) {
+    const isPdf = c.image && c.image.endsWith('.pdf');
+    const delay = (idx % 4) + 1;
+    const credUrl = c.credentialUrl || '#';
+    const issuerColor = c.issuerColor || '#2563EB';
+
+    const previewHtml = isPdf
+      ? `<div class="cert-card__pdf-preview">
+           <div class="cert-card__pdf-icon">${icon('file-text')}</div>
+           <span class="cert-card__pdf-label">Certificate PDF</span>
+         </div>`
+      : c.image
+        ? `<div class="cert-card__img-wrap">
+             <img src="${c.image}" alt="${esc(c.title)}" class="cert-card__img" loading="eager"
+               onerror="window.certImgError(this)" />
+             <div class="cert-card__img-overlay"></div>
+           </div>`
+        : `<div class="cert-card__pdf-preview"><div class="cert-card__pdf-icon">${icon('award')}</div></div>`;
+
+    const validUntilHtml = c.validUntil
+      ? `<span class="cert-meta__valid">Valid until ${esc(c.validUntil)}</span>` : '';
+    const hoursHtml = c.hours
+      ? `<span class="cert-meta__hours">${icon('clock')} ${esc(c.hours)}</span>` : '';
+
+    return `
+      <div class="cert-card reveal reveal-delay-${delay}">
+        <a href="${credUrl}" target="_blank" rel="noopener noreferrer" class="cert-card__preview-link">
+          ${previewHtml}
+        </a>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer-row">
+            <span class="cert-card__issuer-logo">${ISSUER_ICONS[c.issuer] || `<svg viewBox="0 0 24 24" width="18" height="18"><rect width="24" height="24" rx="4" fill="${c.issuerColor||'#2563EB'}"/><path d="M12 6l1.5 4.5H18l-3.75 2.73 1.43 4.4L12 15.18l-3.68 2.45 1.43-4.4L6 10.5h4.5z" fill="#fff"/></svg>`}</span>
+            <span class="cert-card__issuer">${esc(c.issuer || 'Certificate')}</span>
+          </div>
+          <h4 class="cert-card__title">${esc(c.title)}</h4>
+          <p class="cert-card__desc">${esc(c.description)}</p>
+          <div class="cert-card__meta">
+            <span class="cert-meta__date">${icon('calendar')} ${esc(c.date || '')}</span>
+            ${hoursHtml}
+            ${validUntilHtml}
+          </div>
+          <a href="${credUrl}" target="_blank" rel="noopener noreferrer" class="cert-card__btn">
+            ${icon('external-link')} View Certificate
+          </a>
+        </div>
+      </div>
+    `;
+  }
+
 
   document.getElementById('achievements').innerHTML = `
     <div class="container">
@@ -559,9 +625,9 @@ function renderAchievements(content) {
         <p class="section-subtitle">Recognition, impact metrics, and continuous learning milestones.</p>
       </div>
       <div class="ach-section-label">🏆 Achievements</div>
-      <div class="ach-grid ach-grid--achievements">${achievements.map((a,i) => achieveCard(a,i,false)).join('')}</div>
+      <div class="ach-grid ach-grid--achievements">${achievements.map((a,i) => achieveCard(a,i)).join('')}</div>
       <div class="ach-section-label ach-section-label--cert">📜 Certifications</div>
-      <div class="ach-grid ach-grid--certs">${certs.map((a,i) => achieveCard(a,i,true)).join('')}</div>
+      <div class="cert-grid">${certs.map((c,i) => certCard(c,i)).join('')}</div>
     </div>
   `;
 }

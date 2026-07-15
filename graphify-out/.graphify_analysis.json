@@ -1,0 +1,136 @@
+{
+  "communities": {
+    "0": [
+      "app_icon",
+      "app_renderachievements",
+      "app_renderall",
+      "app_renderbacktotop",
+      "app_rendereducation",
+      "app_renderexperience",
+      "app_renderhero",
+      "app_renderopensource",
+      "app_renderprojects",
+      "app_renderskills"
+    ],
+    "1": [
+      "app",
+      "app_achievement_gradients",
+      "app_animatecounters",
+      "app_icons",
+      "app_initherocounters",
+      "app_initnav",
+      "app_initscrollreveal",
+      "app_inittypinganimation",
+      "app_skill_proficiency"
+    ],
+    "2": [
+      "app_esc",
+      "app_renderabout",
+      "app_renderai",
+      "app_rendercontact",
+      "app_renderfooter",
+      "app_rendernav"
+    ],
+    "3": [
+      "app_formatperiod",
+      "app_getdurationmonths",
+      "app_parseyearmonth"
+    ],
+    "4": [
+      "app_getdynamicyears",
+      "app_resolvestatvalue"
+    ],
+    "5": [
+      "content",
+      "content_portfolio_content"
+    ]
+  },
+  "cohesion": {
+    "0": 0.3333333333333333,
+    "1": 0.2222222222222222,
+    "2": 0.3333333333333333,
+    "3": 0.6666666666666666,
+    "4": 1.0,
+    "5": 1.0
+  },
+  "gods": [
+    {
+      "id": "app_renderall",
+      "label": "renderAll()",
+      "degree": 14
+    },
+    {
+      "id": "app_icon",
+      "label": "icon()",
+      "degree": 13
+    },
+    {
+      "id": "app_esc",
+      "label": "esc()",
+      "degree": 7
+    },
+    {
+      "id": "app_parseyearmonth",
+      "label": "parseYearMonth()",
+      "degree": 4
+    },
+    {
+      "id": "app_rendernav",
+      "label": "renderNav()",
+      "degree": 4
+    },
+    {
+      "id": "app_renderhero",
+      "label": "renderHero()",
+      "degree": 4
+    },
+    {
+      "id": "app_renderabout",
+      "label": "renderAbout()",
+      "degree": 4
+    },
+    {
+      "id": "app_renderai",
+      "label": "renderAI()",
+      "degree": 4
+    },
+    {
+      "id": "app_rendercontact",
+      "label": "renderContact()",
+      "degree": 4
+    },
+    {
+      "id": "app_renderfooter",
+      "label": "renderFooter()",
+      "degree": 4
+    }
+  ],
+  "surprises": [
+    {
+      "source": "renderAbout()",
+      "target": "icon()",
+      "source_files": [
+        "app.js",
+        "app.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "note": "Bridges community 0 \u2192 community 2"
+    },
+    {
+      "source": "getDynamicYears()",
+      "target": "parseYearMonth()",
+      "source_files": [
+        "app.js",
+        "app.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "note": "Bridges community 3 \u2192 community 4"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
